@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: '.env');
   runApp(const MyApp());
 }
 
@@ -11,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Weather App',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -30,7 +33,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Weather App'),
     );
   }
 }
@@ -56,6 +59,25 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  void _fetchWeather() async {
+    try {
+      String apiKey = dotenv.env['WEATHER_API_KEY']!;
+
+      final response = await http.get(
+        Uri.parse(
+          'http://api.weatherapi.com/v1/current.json?key=$apiKey&q=London&aqi=yes',
+        ),
+      );
+      if (response.statusCode == 200) {
+        print(response.body);
+      } else {
+        print('Failed to fetch weather data');
+      }
+    } catch (e) {
+      print('Failed to fetch weather data: $e');
+    }
+  }
+
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -69,6 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    _fetchWeather();
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -104,8 +127,8 @@ class _MyHomePageState extends State<MyHomePage> {
           // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
+            const SelectableText('You have pushed the button this many times:'),
+            SelectableText(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
