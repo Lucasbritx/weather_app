@@ -19,11 +19,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Weather App',
       // TODO make dynamic based on device locale and change on selection
-      locale: const Locale('en'),
+      locale: const Locale('pt'),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: L10n.all,
       // TODO dark theme

@@ -62,7 +62,7 @@ class Current {
   final double feelslikeC;
   final double feelslikeF;
   final double uv;
-  final AirQuality airQuality;
+  final AirQuality? airQuality;
 
   Current({
     required this.tempC,
@@ -82,7 +82,7 @@ class Current {
     required this.feelslikeC,
     required this.feelslikeF,
     required this.uv,
-    required this.airQuality,
+    this.airQuality,
   });
 
   factory Current.fromJson(Map<String, dynamic> json) {
@@ -104,7 +104,10 @@ class Current {
       feelslikeC: json['feelslike_c'],
       feelslikeF: json['feelslike_f'],
       uv: json['uv'],
-      airQuality: AirQuality.fromJson(json['air_quality']),
+      airQuality:
+          json['air_quality'] != null
+              ? AirQuality.fromJson(json['air_quality'])
+              : null,
     );
   }
 }
@@ -114,11 +117,7 @@ class Condition {
   final String icon;
   final int code;
 
-  Condition({
-    required this.text,
-    required this.icon,
-    required this.code,
-  });
+  Condition({required this.text, required this.icon, required this.code});
 
   factory Condition.fromJson(Map<String, dynamic> json) {
     return Condition(
@@ -130,24 +129,24 @@ class Condition {
 }
 
 class AirQuality {
-  final double co;
-  final double no2;
-  final double o3;
-  final double so2;
-  final double pm25;
-  final double pm10;
-  final int usEpaIndex;
-  final int gbDefraIndex;
+  final double? co;
+  final double? no2;
+  final double? o3;
+  final double? so2;
+  final double? pm25;
+  final double? pm10;
+  final int? usEpaIndex;
+  final int? gbDefraIndex;
 
   AirQuality({
-    required this.co,
-    required this.no2,
-    required this.o3,
-    required this.so2,
-    required this.pm25,
-    required this.pm10,
-    required this.usEpaIndex,
-    required this.gbDefraIndex,
+    this.co,
+    this.no2,
+    this.o3,
+    this.so2,
+    this.pm25,
+    this.pm10,
+    this.usEpaIndex,
+    this.gbDefraIndex,
   });
 
   factory AirQuality.fromJson(Map<String, dynamic> json) {

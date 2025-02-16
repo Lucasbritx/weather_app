@@ -6,19 +6,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:weather_app/classes/weather_data.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
+import 'package:weather_app/modules/home/components/input.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
@@ -28,6 +19,14 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Future<WeatherData>? _weatherData;
+  String inputValue = '';
+
+  void _handleInputValueChange(String value) {
+    setState(() {
+      inputValue = value;
+      _weatherData = _fetchWeather();
+    });
+  }
 
   @override
   initState() {
@@ -39,14 +38,14 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       String apiKey = dotenv.env['WEATHER_API_KEY']!;
       Position position = await Geolocator.getCurrentPosition();
-      print("Latitude: ${position.latitude}, Longitude: ${position.longitude}");
-
       String latLong =
-          position.latitude.toString() + ',' + position.longitude.toString();
+          '${position.latitude.toString()},${position.longitude.toString()}';
+
+      String filter = inputValue.isNotEmpty ? inputValue : latLong;
 
       final response = await http.get(
         Uri.parse(
-          'http://api.weatherapi.com/v1/current.json?key=$apiKey&q=$latLong&aqi=yes',
+          'http://api.weatherapi.com/v1/current.json?key=$apiKey&q=$filter&aqi=yes',
         ),
       );
       if (response.statusCode == 200) {
@@ -82,14 +81,10 @@ class _MyHomePageState extends State<MyHomePage> {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(
-                    width: 250,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Enter a location',
-                      ),
-                    ),
+                  Input(
+                    title: AppLocalizations.of(context)!.enterLocation,
+                    value: inputValue,
+                    onInputChange: _handleInputValueChange,
                   ),
                   Text(
                     'Location: ${weather.location.name} ${weather.location.region} (${weather.location.country})',
