@@ -1,0 +1,21 @@
+{
+    "language": "English",
+    "@language": {
+        "description": "The current language"
+    },
+    
+    "title": "Weather app",
+    "@title": {
+        "description": "Home title"
+    },
+
+    "enterLocation": "Enter a location",
+    "@enterLocation": {
+        "description": "Input to set location placeholder"
+    },
+
+    "location": "Location",
+    "@location": {
+        "description": "User location text"
+    }
+}
