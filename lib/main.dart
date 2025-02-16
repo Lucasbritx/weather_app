@@ -131,7 +131,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   Text('Location: ${weather.location.name} ${weather.location.region} (${weather.location.country})'),
                   Text('Temperature: ${weather.current.tempC}°C'),
-                  /* Image.network('http:${weather.iconUrl}'), */
+                  Text(' ${weather.current.condition.text}'),
+                  Image.network('http:${weather.current.condition.icon}'),
                 ],
               );
             } else {
