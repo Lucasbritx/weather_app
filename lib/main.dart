@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:weather_app/classes/weather_data.dart';
 
 void main() async {
   await dotenv.load(fileName: '.env');
@@ -58,40 +62,49 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  Future<WeatherData>? _weatherData;
 
-  void _fetchWeather() async {
+  @override
+  initState() {
+    super.initState();
+    _weatherData = _fetchWeather();
+  }
+
+  Future<WeatherData> _fetchWeather() async {
     try {
       String apiKey = dotenv.env['WEATHER_API_KEY']!;
+      Position position = await Geolocator.getCurrentPosition();
+      print("Latitude: ${position.latitude}, Longitude: ${position.longitude}");
+
+      String latLong =
+          position.latitude.toString() + ',' + position.longitude.toString();
 
       final response = await http.get(
         Uri.parse(
-          'http://api.weatherapi.com/v1/current.json?key=$apiKey&q=London&aqi=yes',
+          'http://api.weatherapi.com/v1/current.json?key=$apiKey&q=$latLong&aqi=yes',
         ),
       );
       if (response.statusCode == 200) {
         print(response.body);
+        return WeatherData.fromJson(jsonDecode(response.body));
       } else {
         print('Failed to fetch weather data');
+        throw Exception('Failed to load weather data');
       }
     } catch (e) {
       print('Failed to fetch weather data: $e');
+      throw Exception('Failed to load weather data');
     }
   }
 
   void _incrementCounter() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _counter++;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    _fetchWeather();
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -100,39 +113,31 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const SelectableText('You have pushed the button this many times:'),
-            SelectableText(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+        child: FutureBuilder<WeatherData>(
+          future: _weatherData,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else if (snapshot.hasData) {
+              final weather = snapshot.data!;
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Location: ${weather.location.name} ${weather.location.region} (${weather.location.country})'),
+                  Text('Temperature: ${weather.current.tempC}°C'),
+                  /* Image.network('http:${weather.iconUrl}'), */
+                ],
+              );
+            } else {
+              return Text('No data available');
+            }
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton(
