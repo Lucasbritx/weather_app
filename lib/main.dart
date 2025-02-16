@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Weather App',
+      // TODO make dynamic based on device locale and change on selection
       locale: const Locale('en'),
       localizationsDelegates: const [
         AppLocalizations.delegate,
