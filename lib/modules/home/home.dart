@@ -97,6 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     'Location: ${weather.location.name} ${weather.location.region} (${weather.location.country})',
                   ),
                   Text('Temperature: ${weather.current.tempC}°C'),
+                  Text('Feels like: ${weather.current.feelslikeC}°C'),
                   Text(' ${weather.current.condition.text}'),
                   Image.network('http:${weather.current.condition.icon}'),
                 ],
