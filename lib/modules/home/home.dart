@@ -49,7 +49,6 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
       if (response.statusCode == 200) {
-        print(response.body);
         return WeatherData.fromJson(jsonDecode(response.body));
       } else {
         print('Failed to fetch weather data');
