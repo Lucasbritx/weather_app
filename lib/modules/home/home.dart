@@ -64,8 +64,16 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(AppLocalizations.of(context)!.title),
+        backgroundColor: Colors.blue,
+        title: Text(
+          AppLocalizations.of(context)!.title,
+          style: TextStyle(
+            color: Colors.white,
+            fontFamily: 'Georgia',
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: Center(
         child: FutureBuilder<WeatherData>(
